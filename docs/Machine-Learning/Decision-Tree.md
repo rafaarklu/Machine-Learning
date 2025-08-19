@@ -9,5 +9,5 @@
 
 
 ``` python exec="on" html="1"
---8<-- "./docs/Machine Learning/decision-script.py"
+--8<-- "./docs/Machine-Learning/decision-script.py"
 ```
