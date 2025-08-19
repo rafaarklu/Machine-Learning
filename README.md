@@ -33,3 +33,10 @@ Para subir ao GitHub Pages, execute o comando:
 ``` shell
 mkdocs gh-deploy
 ```
+
+
+
+## Arvore de Decisão
+
+A base utilizada foi uma base de carros usados da BMW
+https://www.kaggle.com/datasets/adityadesai13/used-car-dataset-ford-and-mercedes/data
