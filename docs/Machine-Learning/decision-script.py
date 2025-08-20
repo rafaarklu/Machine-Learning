@@ -29,7 +29,7 @@ x['fuelType'] = label_encoder.fit_transform(x['fuelType'])
 #setar a saida
 y= df['consumo_cat'] = pd.cut(
         df['mpg'],
-        bins=[0, 40, 60, 100],   # faixas (ajustáveis)
+        bins=[0, 25, 40, 100],   # faixas (ajustáveis)
         labels=['baixo', 'medio', 'alto']
 )
 
