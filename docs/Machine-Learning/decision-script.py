@@ -13,7 +13,7 @@ plt.figure(figsize=(12, 10))
 
 path = kagglehub.dataset_download("adityadesai13/used-car-dataset-ford-and-mercedes")
 
-df = pd.read_csv(path + "/bmw.csv")  # Adjust filename as needed
+df = pd.read_csv(path + "/bmw.csv")  
 x = df[['model', 'year', 'price', 'transmission', 'mileage', 'fuelType', 'tax', 'engineSize']]
 
 label_encoder = LabelEncoder()
@@ -35,21 +35,21 @@ y= df['consumo_cat'] = pd.cut(
 
 
 
-# After creating x and y
+
 data = x.copy()
 data['target'] = y
 
-# Drop rows with NaN in any column
+# Deletar linhas com valores ausentes
 data = data.dropna()
 
-# Split features and target again
+# Dividir em características (X) e alvo (y)
 x_clean = data.drop('target', axis=1)
 y_clean = data['target']
 
-# Train/test split
+# Treinar e testar o modelo
 x_train, x_test, y_train, y_test = train_test_split(
     x_clean, y_clean, 
-    test_size=0.9, 
+    test_size=0.7, 
     random_state=42
 )
 
