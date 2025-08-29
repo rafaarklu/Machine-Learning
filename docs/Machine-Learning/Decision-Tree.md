@@ -13,6 +13,13 @@ Essa Arquivo .CSV possui dados de carros usados da marca BWM nos Estados Unidos,
 Com esses dados é possível montar um modelo preditivo para descobrir o gasto de combustivel ('Alto, médio ou baixo')
 
 Obs: medida utilizada é mpg (miles per galon)
+-------------------------------------------------------------------------------------------------------------------------
+## Analise gráfica
+
+``` python exec="on" html="1"
+--8<-- "./docs/Machine-Learning/script-analisis.py"
+```
+
 
 -------------------------------------------------------------------------------------------------
 
