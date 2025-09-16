@@ -16,5 +16,6 @@ pandas
 yfinance
 kagglehub
 scikit-learn
+seaborn
 
 

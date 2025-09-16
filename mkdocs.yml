@@ -135,6 +135,8 @@ nav:
   - Home: index.md
   - Roteiros:
     - Machine-Learning: ./Machine-Learning/Decision-Tree.md
+    - KNN: ./k-nearest-neighbor/main.md
+    - K-Means: ./k-means/main.md
     - Roteiro 1: ./roteiro1/main.md
     - Roteiro 2: ./roteiro2/main.md
     - Roteiro 3: ./roteiro3/main.md
