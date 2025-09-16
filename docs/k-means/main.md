@@ -1,5 +1,8 @@
 # K-MEANS TEST
 
+
+
+    
 === "output"
 
     ``` python exec="on" html="1"
@@ -9,5 +12,5 @@
 === "code"
 
     ``` python exec="off"
-    --8<-- "./docs/k-means/kmeans_scripit.py"
+    --8<-- "./docs/k-means/kmeans_script.py"
     ```
