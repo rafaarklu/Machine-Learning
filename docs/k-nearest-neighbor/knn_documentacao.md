@@ -3,26 +3,7 @@
 ## Base de Dados Utilizada
 
 A base de dados utilizada é o conjunto de carros usados da BMW:\
-[https://www.kaggle.com/datasets/adityadesai13/used-car-dataset-ford-and-mercedes/data](https://www.kaggle.com/datasets/adityadesai13/used-car-dataset-ford-and-mercedes/data)
-
-
-
-
-
-## Modelo KNN
-
-=== "output"
-
-    ``` python exec="on" html="1"
-    --8<-- "./docs/k-nearest-neighbor/knn_script.py"
-    ```
-
-=== "code"
-
-    ``` python exec="off"
-    --8<-- "./docs/k-nearest-neighbor/knn_script.py"
-    ```
-
+https://www.kaggle.com/datasets/adityadesai13/used-car-dataset-ford-and-mercedes/data
 
 ## Objetivo do Projeto
 
@@ -48,7 +29,19 @@ KNN prevê para qualquer novo carro que caia naquela área do plano 2D.
   Petrol                Vermelho/Laranja
   Hybrid                Roxo (áreas menores)
 
+### Exportar para as Planilhas
 
+O alto desempenho do modelo (**acurácia esperada acima de 0.90**)
+demonstra que o `Engine Size` e a `Mileage` são preditores fortes para o
+`fuelType` dentro do dataset da BMW.
+
+=== "output"
+
+`python exec="on" html="1" --8<-- "./docs/k-nearest-neighbor/knn_script.py"`
+
+=== "code"
+
+`python exec="off" --8<-- "./docs/k-nearest-neighbor/knn_script.py"`
 
 ## Passo a Passo da Implementação
 
