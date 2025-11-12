@@ -1,94 +1,60 @@
-# Template de Entrega
 
+# Machine Learning documentation Project
 
-???+ info inline end "Edição"
+---
+# Autor
+!!! tip "Author"
+    Rafael Arkchimor Lucena
+    
 
-    2025.1
+- Linkedin: [https://www.linkedin.com/in/rafael-lucena-0273b82b3/](https://www.linkedin.com/in/rafael-lucena-0273b82b3/)
 
+- Github: [https://github.com/rafaarklu/](https://github.com/rafaarklu/)
 
-## Grupo
+- email: rafa.arklu@gmail.com
 
-1. Rafael Arkchimor Lucena
-
-
-!!! tip "Instruções"
-
-    Vocês devem utilizar este template como um bloco de notas para registrar o que foi feito e o que falta fazer. Vocês devem adicionar as informações necessárias.
-    O template deve ser editado e atualizado a cada entrega, registrando assim a data de entrega e o que foi feito até o momento via Git.
-
-## Entregas
-
-- [x] Machine Learning
-- [ ] Roteiro 2
-- [ ] Roteiro 3
-- [ ] Roteiro 4
-- [ ] Projeto
-
-## Diagramas
-
-Use o [Mermaid](https://mermaid.js.org/intro/){:target='_blank'} para criar os diagramas de documentação.
-
-[Mermaid Live Editor](https://mermaid.live/){:target='_blank'}
-
-
-``` mermaid
-flowchart TD
-    Deployment:::orange -->|defines| ReplicaSet
-    ReplicaSet -->|manages| pod((Pod))
-    pod:::red -->|runs| Container
-    Deployment -->|scales| pod
-    Deployment -->|updates| pod
-
-    Service:::orange -->|exposes| pod
-
-    subgraph  
-        ConfigMap:::orange
-        Secret:::orange
-    end
-
-    ConfigMap --> Deployment
-    Secret --> Deployment
-    classDef red fill:#f55
-    classDef orange fill:#ffa500
-```
+---
+Este projeto reúne material de referência, scripts e exemplos práticos dos principais métodos estudados: K-Nearest Neighbors (KNN), K-Means, Árvores de Decisão, Random Forest e métricas de avaliação. O objetivo é servir como material didático e repositório de apoio para estudos e experimentos.
 
 
 
-## Códigos
+## O que há neste repositório
 
-=== "De um arquivo remoto"
+Uma visão geral das seções/documentos disponíveis:
 
-    ``` { .yaml .copy .select linenums='1' title="main.yaml" }
-    --8<-- "https://raw.githubusercontent.com/hsandmann/documentation.template/refs/heads/main/.github/workflows/main.yaml"
-    ```
+- K-Nearest Neighbors (KNN) — abordagem clássica de classificação; exemplos e código: ./k-nearest-neighbor/main.md
+- K-Means — algoritmo de clusterização com exemplos práticos: ./k-means/main.md
+- Árvores de Decisão — projeto e análise: ./Machine-Learning/decision_tree_project.md (código em `docs/Machine-Learning/decision-script.py` e `docs/projeto/decision_tree_project.py`)
+- Random Forest — ensemble de árvores e suas aplicações: ./random-forest/main.md
+- Métricas — funções e exemplificações de métricas de avaliação (acurácia, precisão, recall, F1, etc.): ./metrics/main.md
 
-=== "Anotações no código"
-
-    ``` { .yaml title="compose.yaml" }
-    name: app
-
-        db:
-            image: postgres:17
-            environment:
-                POSTGRES_DB: ${POSTGRES_DB:-projeto} # (1)!
-                POSTGRES_USER: ${POSTGRES_USER:-projeto}
-                POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-projeto}
-            ports:
-                - 5432:5432 #(2)!
-    ```
-
-    1.  Caso a variável de ambiente `POSTGRES_DB` não exista ou seja nula - não seja definida no arquivo `.env` - o valor padrão será `projeto`. Vide [documentação](https://docs.docker.com/reference/compose-file/interpolation/){target='_blank'}.
-
-    2. Aqui é feito um túnel da porta 5432 do container do banco de dados para a porta 5432 do host (no caso localhost). Em um ambiente de produção, essa porta não deve ser exposta, pois ninguém de fora do compose deveria acessar o banco de dados diretamente.
+Além das páginas acima, o repositório contém scripts em Python localizados nas pastas correspondentes (`docs/k-nearest-neighbor/`, `docs/k-means/`, `docs/Machine-Learning/`, `docs/random-forest/`, `docs/metrics/`). Há também um conjunto de dependências em `requirements.txt` para facilitar a reprodução do ambiente.
 
 
-## Exemplo de vídeo
+## Dados
 
-Lorem ipsum dolor sit amet
+Os datasets utilizados foram obtidos atravez da plataforma kaggle
 
-<iframe width="100%" height="470" src="https://www.youtube.com/embed/3574AYQml8w" allowfullscreen></iframe>
+- [Titanic Dataset](https://www.kaggle.com/datasets/yasserh/titanic-dataset)
+- [Ford and mercedes Used Car](https://www.kaggle.com/datasets/adityadesai13/used-car-dataset-ford-and-mercedes/data)
+
+ 
+## Como navegar nesta documentação
+
+Use a barra lateral do MkDocs (ou o menu superior) para abrir cada tópico. Cada seção contém uma explicação teórica, exemplos de código e, quando aplicável, scripts executáveis que reproduzem os experimentos.
+
+## Ferramentas utilizadas
+
+![Python](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-2.2-blue?logo=pandas&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-1.26-blue?logo=numpy&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.5-blue?logo=scikit-learn&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-3.9-blue?logo=matplotlib&logoColor=white)
+![MkDocs Material](https://img.shields.io/badge/MkDocs%20Material-Theme-blueviolet?logo=material-design&logoColor=white)
+![kaggle](https://img.shields.io/badge/kaggle-blue)
 
 
-## Referências
+---
 
-[Material for MkDocs](https://squidfunk.github.io/mkdocs-material/reference/){:target='_blank'}
+
+

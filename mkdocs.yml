@@ -6,6 +6,9 @@ repo_name: Machine-Learning
 
 theme:
   name: material
+  font:
+    text: Unbounded
+    code: Roboto Mono
   palette:
     # primary: grey
     # Light mode
@@ -110,7 +113,7 @@ plugins:
       enable_creation_date: true
   - git-authors
   - git-committers:
-      repository: hsandmann/hsandmann.github.com
+      repository: https://github.com/rafaarklu
       branch: main
   - search
   - badges
@@ -123,6 +126,12 @@ plugins:
       prompt_literal_start:
         - "$"
         - ">"
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/rafaarklu
+      name: Rafael Arkchimor Lucena no GitHub
 
 extra_javascript:
   - https://unpkg.com/mathjax/es5/tex-mml-chtml.js
