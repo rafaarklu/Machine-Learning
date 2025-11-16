@@ -17,5 +17,5 @@ yfinance
 kagglehub
 scikit-learn
 seaborn
-
+networkx
 

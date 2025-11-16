@@ -16,7 +16,7 @@
 === "code"
 
     ``` python exec="off" 
-    -  -8<-- "./docs/random-forest/random-forest.py"
+    --8<-- "./docs/random-forest/random-forest.py"
     ```
 
 

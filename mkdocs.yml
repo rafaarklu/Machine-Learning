@@ -148,3 +148,4 @@ nav:
     - K-Means: ./k-means/main.md
     - Metrics: ./metrics/main.md
     - Random-Forest: ./random-forest/main.md
+    - Page-Rank: ./pagerank/main.md
