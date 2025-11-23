@@ -7,25 +7,120 @@ output: html_document
 
 # Machine Learning com Árvore de Decisão
 
-## Tabela Utilizada
+## Dados Utilizados
 [Dataset - Kaggle](https://www.kaggle.com/datasets/adityadesai13/used-car-dataset-ford-and-mercedes/data)
 
 Utilizaremos a base de dados de **carros usados da BMW** para prever a **categoria de consumo de combustível** (*baixo, médio ou alto*) com base nas características do veículo.
 
-## Características (Features) Utilizadas
 
-- **Model** (modelo)  
-- **Year** (ano do carro)  
-- **Price** (preço)  
-- **Transmission** (tipo de transmissão do carro)  
-- **Mileage** (quilometragem)  
-- **FuelType** (tipo de combustível)  
-- **Tax** (imposto)  
-- **Engine Size** (tamanho do motor)  
+=== "model"
 
-## Variável Alvo (Target)
+    Tipo: categórica nominal
+    O que é: modelo do carro (1 Series, 3 Series, 5 Series etc.).
+    Para que serve: variável altamente relevante para preço.
+    Ação necessária: transformar em dummies; verificar categorias muito raras.
 
-**consumo_cat**: Uma categoria (*baixo, médio, alto*) criada a partir da coluna `mpg` (Milhas por Galão), que indica a eficiência de combustível.
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_bmw/model.py"
+    ```
+
+
+=== "year"
+
+    Tipo: numérica discreta
+    O que é: ano de fabricação.
+    Para que serve: influencia fortemente o preço devido à depreciação.
+    Ação necessária: manter; possível criar “idade = ano_atual – year”.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_bmw/year.py"
+    ```
+
+
+=== "price"
+
+    Tipo: numérica contínua (target típica)
+    O que é: preço do carro em dólares/libra (dependendo da base).
+    Para que serve: variável dependente caso o modelo seja regressão.
+    Ação necessária: checar outliers e distribuição; possível usar log-transform.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_bmw/price.py"
+    ```
+
+
+=== "transmission"
+
+    Tipo: categórica nominal
+    O que é: tipo de transmissão (Manual, Automatic, Semi-Auto).
+    Para que serve: algumas transmissões valorizam/desvalorizam o veículo.
+    Ação necessária: transformar em dummies; checar categorias pouco frequentes.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_bmw/transmission.py"
+    ```
+
+    
+
+
+=== "mileage"
+
+    Tipo: numérica contínua
+    O que é: quilometragem rodada.
+    Para que serve: altamente correlacionado ao preço (quanto maior, menor o valor).
+    Ação necessária: checar outliers; normalização opcional.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_bmw/mileage.py"
+    ```
+
+
+=== "fuelType"
+
+    Tipo: categórica nominal
+    O que é: tipo de combustível (Diesel, Petrol, Hybrid etc.).
+    Para que serve: tem impacto direto no consumo, custo de manutenção e preço.
+    Ação necessária: dummies; verificar equilíbrio entre categorias.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_bmw/fueltype.py"
+    ```
+
+=== "tax"
+
+    Tipo: numérica contínua
+    O que é: imposto anual do veículo.
+    Para que serve: relacionado ao consumo/emissão; pode influenciar o valor.
+    Ação necessária: manter; tratar outliers.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_bmw/tax.py"
+    ```
+
+
+=== "mpg"
+
+    Tipo: numérica contínua
+    O que é: consumo em milhas por galão.
+    Para que serve: eficiência energética; compradores valorizam modelos econômicos.
+    Ação necessária: manter; verificar valores absurdos.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_bmw/mpg.py"
+    ```
+
+=== "engineSize"
+
+    Tipo: numérica contínua
+    O que é: tamanho do motor em litros.
+    Para que serve: impacta desempenho e consumo; influencia preço.
+    Ação necessária: manter; checar valores inconsistentes.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_bmw/enginesize.py"
+    ```
+
+
 
 ---
 

@@ -2,8 +2,125 @@
 
 ## Base de Dados Utilizada
 
-A base de dados utilizada é o dataset do Titanic, obtido através da biblioteca `kagglehub`:\
-https://www.kaggle.com/datasets/brendan45774/test-file
+[Dataset - Kaggle](https://www.kaggle.com/datasets/yasserh/titanic-dataset)
+
+
+=== "PassengerId"
+
+    Tipo: numérica discreta
+    O que é: identificador único do passageiro.
+    Para que serve: não contém informação útil para predição.
+    Ação necessária: remover do modelo.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_titanic/passid.py"
+    ```
+
+=== "Survived"
+
+    Tipo: categórica binária (target)
+    O que é: 1 = sobreviveu; 0 = não sobreviveu.
+    Para que serve: variável dependente a ser prevista.
+    Ação necessária: checar balanceamento (a classe 0 é ligeiramente maior).
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_titanic/survived.py"
+    ```
+
+=== "Pclass"
+
+    Tipo: categórica ordinal
+    O que é: classe socioeconômica do ticket (1ª, 2ª, 3ª).
+    Para que serve: proxy de condição financeira/social que influencia sobrevivência.
+    Ação necessária: manter como categórica ordinal; verificar distribuição nas classes.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_titanic/pclass.py"
+    ```
+
+
+
+
+=== "Sex"
+
+    Tipo: categórica binária
+    Oque é: sexo biológico do passageiro (male/female).
+    Para que serve: uma das variáveis mais importantes na sobrevivência.
+    Ação necessária: codificar para dummy (female → 1, male → 0).
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_titanic/sex.py"
+    ```
+
+=== "Age"
+
+    Tipo: numérica contínua
+    O que é: idade em anos.
+    Para que serve: importante para separar grupos vulneráveis (crianças, adultos).
+    Ação necessária: 177 valores ausentes → imputar (média/mediana ou por título extraído do Name).
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_titanic/age.py"
+    ```
+
+=== "SibSp"
+
+    Tipo: numérica discreta
+    O que é: número de irmãos/cônjuges a bordo.
+    Para que serve: indica tamanho do grupo familiar; pode influenciar sobrevivência.
+    Ação necessária: manter; possível normalizar ou agrupar faixas.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_titanic/age.py"
+    ```
+
+
+=== "Parch"
+
+    Tipo: numérica discreta
+    O que é: número de pais/filhos a bordo.
+    Para que serve: outro indicador do grupo familiar.
+    Ação necessária: manter; possível criar “FamilySize = SibSp + Parch + 1”.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_titanic/parch.py"
+    ```
+
+=== "Ticket"
+
+    Tipo: categórica (texto)
+    O que é: número/código do ticket.
+    Para que serve: pouco útil originalmente; pode ajudar se agrupado por prefixos.
+    Ação necessária: normalmente remover.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_titanic/ticket.py"
+    ```
+
+
+=== "Fare"
+
+    Tipo: numérica contínua
+    O que é: tarifa paga pelo ticket.
+    Para que serve: relação com classe social; boa variável preditiva.
+    Ação necessária: checar outliers; possível normalização logarítmica.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_titanic/fare.py"
+    ```
+
+
+=== "Embarked"
+
+    Tipo: categórica nominal
+    O que é: porto de embarque (C, Q, S).
+    Para que serve: pode refletir diferenças sociais/regionais.
+    Ação necessária: imputar os 2 valores ausentes; criar dummies.
+
+    ```python exec="on" html="1"
+    --8<-- "docs/grafico_titanic/embarked.py"
+    ```
+
 
 ## Objetivo do Projeto
 
@@ -35,13 +152,6 @@ O gráfico gerado abaixo representa a fronteira de decisão do modelo. As regiõ
 
 O desempenho do modelo demonstra que a **Idade** e o **Preço da Passagem (Fare)** são preditores significativos para a sobrevivência no Titanic. Passageiros com passagens mais caras (classes mais altas) tinham maior probabilidade de sobreviver, assim como certos grupos etários.
 
-=== "output"
-
-`python exec="on" html="1" --8<-- "./docs/k-nearest-neighbor/knn_script.py"`
-
-=== "code"
-
-`python exec="off" --8<-- "./docs/k-nearest-neighbor/knn_script.py"`
 
 ## Passo a Passo da Implementação
 
