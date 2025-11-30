@@ -149,3 +149,4 @@ nav:
     - Metrics: ./metrics/main.md
     - Random-Forest: ./random-forest/main.md
     - Page-Rank: ./pagerank/main.md
+    - svm: ./svm/main.md
