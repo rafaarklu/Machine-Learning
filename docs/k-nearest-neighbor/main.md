@@ -121,21 +121,55 @@
     --8<-- "docs/grafico_titanic/embarked.py"
     ```
 
+ 
 
-## Objetivo do Projeto
+# Objetivo do projeto
 
-O objetivo deste trabalho é aplicar o algoritmo K-Nearest Neighbors (KNN) para resolver um problema de **Classificação Binária** e prever a **Sobrevivência (Survived)** de um passageiro no Titanic.
+Aplicar o algoritmo **K-Nearest Neighbors (KNN)** para um problema de **classificação binária**: prever a variável `Survived` do dataset Titanic.  
+Para facilitar a visualização da fronteira de decisão, o modelo usa apenas duas features contínuas: **Age** e **Fare**.
 
-Para simplificar a visualização da fronteira de decisão, o modelo utiliza apenas as seguintes features contínuas:
+---
 
--   **Age (Idade do Passageiro)**
--   **Fare (Preço da Passagem)**
+# Intuição do KNN
 
-## Análise e Modelo KNN (K=5)
+KNN é um método **baseado em instâncias** (lazy learning). Para classificar um ponto novo, o algoritmo encontra os `k` pontos mais próximos no conjunto de treino (vizinhos) e decide a classe pela **maioria** entre esses vizinhos (classificação) ou pela **média** (regressão).  
+A premissa é que pontos próximos no espaço de features tendem a ter o mesmo rótulo.
 
-O gráfico gerado abaixo representa a fronteira de decisão do modelo. As regiões coloridas indicam a classe (sobrevivência) que o modelo KNN prediz para qualquer novo passageiro que caia naquela área do plano 2D.
+---
+
+# Por que escalonar (StandardScaler) é crítico
+
+KNN usa distâncias; se duas features têm escalas muito diferentes (ex.: `Fare` em centenas vs `Age` em dezenas), a feature com maior escala dominará a distância e irá enviesar a decisão.  
+O `StandardScaler` transforma cada feature de modo que todas tenham média 0 e desvio padrão 1, tornando as features comparáveis.
+
+---
+
+# Complexidade e limitações práticas
+
+- **Complexidade na predição**: O(n · d) por instância (n = nº de amostras de treino, d = dimensão). Para muitos pontos de treino, predição fica cara.  
+- **Curse of dimensionality**: em alta dimensão, distâncias tornam-se menos discriminativas → KNN perde eficácia.  
+- **Sensível a ruído e outliers**: vizinhos ruidosos mudam a predição.  
+- **Escolha de k**: pequeno → mais variance (overfitting); grande → mais bias (underfitting).  
+- **Balanceamento de classes**: em caso de classes desbalanceadas, vizinhança pode ser dominada pela classe majoritária local.
+
+Acelerações: KD-Tree, Ball-Tree, aproximações (approx. nearest neighbors) ou redução de dimensionalidade (PCA, UMAP).
+
+---
+
+# Hiperparâmetros importantes e tuning
+
+- `n_neighbors (k)`: testar via validação cruzada (CV). Valores comuns: 3,5,7,9.  
+- `metric`: distância a usar (euclidiana, manhattan, minkowski).  
+- `weights`: `uniform` (voto igual) ou `distance` (vizinhos mais próximos têm mais peso).  
+- Pré-processamento: escolha de scaler, tratamento de outliers, e engenharia de features.
+
+Dica prática: use `GridSearchCV` ou `cross_val_score` para escolher `k` com base em métricas (accuracy, F1, ROC-AUC).
+
+---
 
 
+
+# Código Exemplo e gráfico
 
 === "output"
 
@@ -148,113 +182,35 @@ O gráfico gerado abaixo representa a fronteira de decisão do modelo. As regiõ
     ``` python exec="off"
     --8<-- "./docs/k-nearest-neighbor/knn_script.py"
     ```
-### Interpretação dos Resultados
 
-O desempenho do modelo demonstra que a **Idade** e o **Preço da Passagem (Fare)** são preditores significativos para a sobrevivência no Titanic. Passageiros com passagens mais caras (classes mais altas) tinham maior probabilidade de sobreviver, assim como certos grupos etários.
+---
+
+# Interpretação dos resultados
+
+- **Accuracy e classification report** dão uma visão global do desempenho (precision, recall, F1) por classe.  
+- **Fronteira de decisão**: ilustra como o modelo divide o espaço `Age × Fare`.  
+- **Insights práticos**: passageiro com `Fare` escalado alto tende a ser classificado como `Sobreviveu` (reflexo de classes sociais/posicionamento no navio). Padrões por idade também aparecem (ex.: grupos jovens ou muito idosos podem ter maior ou menor probabilidade, dependendo dos vizinhos).
+
+Lembre-se: com apenas duas features, o modelo captura apenas parte da realidade — usar mais features melhora (ou complica) o que o KNN enxerga.
+
+---
+
+# Boas práticas
+
+- **Escolha de k**: avaliar via validação cruzada (ex.: testar k em [1,3,5,7,9,11]).  
+- **Weights**: testar `weights='distance'` para dar mais peso a vizinhos mais próximos.  
+- **Métricas**: além de accuracy, usar ROC-AUC (quando adequado), F1 (em classes desbalanceadas).  
+- **Balanceamento**: em datasets com classes desbalanceadas, considerar undersampling/oversampling ou métricas balanceadas.  
+- **Redução de dimensionalidade**: se aumentar features, usar PCA/TSNE para visualização e possivelmente acelerar.  
+- **Validação por bootstrap ou k-fold**: para estimar variabilidade da métrica.  
+- **Aceleração**: kd_tree/ball_tree ou Approx Nearest Neighbors para muitos exemplos.
+
+---
 
 
-## Passo a Passo da Implementação
+# Conclusão
 
-### 1. Importação de Bibliotecas e Carregamento de Dados
+KNN é simples, interpretável e poderoso em espaços de baixa dimensão com muitos exemplos. No entanto, não escala bem para grandes bases e perde desempenho em alta dimensão. No contexto do Titanic com `Age` e `Fare`, KNN oferece uma boa forma de visualizar como idade e tarifa se relacionam com a sobrevivência, mas deve ser complementado com experimentos (mais features, tuning de k e validação) para tirar conclusões robustas.
 
-Importamos o **StandardScaler**, que é essencial para o algoritmo KNN.
+---
 
-``` python
-import numpy as np
-import matplotlib.pyplot as plt
-from io import StringIO
-from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-from sklearn.preprocessing import StandardScaler # CRÍTICO para KNN
-import seaborn as sns
-import pandas as pd
-import kagglehub
-
-# Carregar o dataset via kagglehub
-kaggle_dataset = kagglehub.dataset_download("brendan45774/test-file")
-df = pd.read_csv(f"{kaggle_dataset}/titanic.csv")
-
-# Selecionar Features (X) e Variável Alvo (y)
-X = df[['Age', 'Fare']]
-y = df['Survived']  # Variável binária: 0 (Não Sobreviveu) ou 1 (Sobreviveu)
-
-# Limpeza e Preparação
-data = X.copy()
-data['Survived'] = y
-data = data.dropna()  # Remove valores ausentes
-
-X_clean = data[['Age', 'Fare']]
-y_clean = data['Survived']
-```
-
-### 2. Escalonamento dos Atributos (StandardScaler)
-
-O KNN é baseado na distância. Sem esta etapa, a variável **Fare** (valores maiores) dominaria o cálculo da distância em relação à **Age** (valores menores), invalidando o modelo.
-
-``` python
-# Aplica a Padronização (StandardScaler)
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X_clean)
-X_scaled_df = pd.DataFrame(X_scaled, columns=X_clean.columns, index=X_clean.index)
-```
-
-### 3. Treinamento e Avaliação do Modelo
-
-Dividimos os dados escalonados (`X_scaled_df`) e treinamos o `KNeighborsClassifier` com **K=5 vizinhos**.
-
-``` python
-# Divisão Treino/Teste (70% Treino, 30% Teste)
-X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled_df, y_clean,
-    test_size=0.3,
-    random_state=42
-)
-
-# Treinar o modelo KNN
-knn = KNeighborsClassifier(n_neighbors=5)
-knn.fit(X_train, y_train)
-
-# Prever e Avaliar
-predictions = knn.predict(X_test)
-print(f"Accuracy: {accuracy_score(y_test, predictions):.2f}")
-print("\nClassification Report:")
-print(classification_report(y_test, predictions, target_names=['Não Sobreviveu', 'Sobreviveu']))
-```
-
-### 4. Geração da Fronteira de Decisão
-
-Este passo gera a grade de visualização para plotar a fronteira de decisão do modelo KNN.
-
-``` python
-plt.figure(figsize=(12, 10))
-
-# Amostragem para plotagem
-sample_size = 5000
-X_vis = X_scaled_df.sample(sample_size, random_state=42)
-y_vis = y_clean.loc[X_vis.index]
-
-# Definição dos limites da grade
-h = 0.05
-x_min, x_max = X_scaled_df.iloc[:, 0].min() - 0.5, X_scaled_df.iloc[:, 0].max() + 0.5
-y_min, y_max = X_scaled_df.iloc[:, 1].min() - 0.5, X_scaled_df.iloc[:, 1].max() + 0.5
-
-# Criação da grade e predição
-xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-grid_points = np.c_[xx.ravel(), yy.ravel()]
-Z = knn.predict(grid_points).reshape(xx.shape)
-
-# Plot da fronteira e dos dados
-plt.contourf(xx, yy, Z, cmap=plt.cm.RdBu_r, alpha=0.3)
-sns.scatterplot(x=X_vis.iloc[:, 0], y=X_vis.iloc[:, 1], hue=y_vis, 
-                style=y_vis, palette={0: 'blue', 1: 'orange'}, 
-                s=100, markers={0: 'o', 1: 'x'}, legend='full')
-
-plt.xlabel("Age (Scaled)")
-plt.ylabel("Fare (Scaled)")
-plt.title("KNN Decision Boundary (k=5) - Titanic Dataset")
-plt.legend(title="Titanic - Survivability", labels=["Não Sobreviveu", "Sobreviveu"])
-
-plt.tight_layout()
-plt.show()
-```

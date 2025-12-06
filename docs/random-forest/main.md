@@ -120,10 +120,71 @@
     --8<-- "docs/grafico_titanic/embarked.py"
     ```
 
+# Random Forest
+
+O objetivo deste documento é **explicar o funcionamento teórico do algoritmo Random Forest**, relacionando-o com a **implementação prática** aplicada ao Titanic Dataset (Kaggle).
+
+---
+
+# O que é Random Forest? (Explicação Teórica)
+
+O **Random Forest** é um algoritmo de aprendizado supervisionado do tipo *ensemble*, baseado em **várias árvores de decisão**.
+
+Ele funciona criando **múltiplas árvores de decisão independentes** e combinando seus resultados por meio de:
+
+- **Voting** (para classificação)
+- **Averaging** (para regressão)
+
+##  Vantagens do Random Forest
+- Reduz o risco de overfitting comparado a uma única árvore.
+- Funciona bem com dados numéricos e categóricos.
+- Tolera dados ruidosos.
+- Não exige normalização ou padronização.
+- Mede automaticamente a **importância das variáveis**.
+
+## Principais conceitos que fazem o Random Forest funcionar
+
+### *Bootstrap Aggregation* (Bagging)
+Cada árvore é treinada em um **subconjunto amostrado com reposição** do dataset original.
+
+Isso cria diversidade entre as árvores.
+
+### Seleção aleatória de atributos
+Ao construir cada divisão na árvore, o algoritmo considera **apenas um subconjunto aleatório de variáveis**.
+
+Isso evita que todas as árvores sejam iguais ➜ aumenta a generalização.
+
+### Out-of-Bag Score (OOB)
+Como parte dos dados não entra na amostra do bootstrap, eles são usados como **validação interna**, dispensando validação cruzada.
+
+---
+
+# Exploração dos Dados (Aplicação Prática)
+
+## Variáveis principais analisadas:
+- `Pclass` 
+- `Sex`
+- `Age`
+- `SibSp`
+- `Parch`
+- `Fare`
+- `Embarked`
+- `Survived` (variável alvo)
+
+---
+
+# Pré-processamento (Prática + Explicação Teórica)
+
+O Random Forest não exige padronização, porém exige:
+
+    - Tratamento de valores ausentes
+    - Codificação de variáveis categóricas (Aplicado One-Hot Encoding)
 
 
-# Código Feito
 
+---
+
+# Código Exemplo e resultado
 
 === "output"
 
@@ -139,88 +200,52 @@
     ```
 
 
-
-## 1. Exploração dos Dados
-
-Nesta etapa, foi realizada a análise inicial do conjunto de dados **Titanic-Dataset** (fonte: Kaggle).  
-O objetivo é prever se um passageiro sobreviveu ou não, com base em suas características demográficas e socioeconômicas.
-
-**Variáveis principais:**
-- `Pclass` — Classe do bilhete (1ª, 2ª ou 3ª classe)  
-- `Sex` — Sexo do passageiro  
-- `Age` — Idade  
-- `SibSp` — Número de irmãos/cônjuges a bordo  
-- `Parch` — Número de pais/filhos a bordo  
-- `Fare` — Tarifa paga  
-- `Embarked` — Porto de embarque (C = Cherbourg, Q = Queenstown, S = Southampton)  
-- `Survived` — Variável alvo (0 = não sobreviveu, 1 = sobreviveu)
-
-**Estatísticas descritivas básicas:**
-- Média de idade ≈ 29,6 anos  
-- Tarifa média ≈ 32,2 libras  
-- Proporção de sobreviventes ≈ 38,4%
-
-O conjunto contém **891 registros**, com algumas variáveis categóricas e valores ausentes em `Age` e `Embarked`.
-
 ---
-
-## 2. Pré-processamento
-
-Foram realizadas as seguintes etapas de preparação dos dados:
-
-- **Tratamento de valores ausentes:**
-  - `Age`: substituído pela média das idades.  
-  - `Embarked`: substituído pelo valor mais frequente (moda).
-
-- **Codificação de variáveis categóricas:**
-  - `Sex` e `Embarked` foram convertidas para formato numérico utilizando **One-Hot Encoding**.
-  - A primeira categoria de cada variável foi removida para evitar multicolinearidade (`drop_first=True`).
-
-- **Normalização:**
-  - Não foi necessária, pois o modelo Random Forest não é sensível à escala dos dados.
-
----
-
-## 3. Divisão dos Dados
-
-O conjunto de dados foi dividido em:
-- **Treino:** 80%  
-- **Teste:** 20%
-
-Essa divisão permite avaliar a capacidade de generalização do modelo.
+# Divisão dos Dados
 
 ```python
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 ```
 
----
-
-## 4. Treinamento do Modelo
-
-O modelo utilizado foi o **RandomForestClassifier** do `scikit-learn`.  
-Foram definidos os seguintes parâmetros:
-
-- `n_estimators=100` → número de árvores  
-- `max_depth=None` → profundidade ilimitada  
-- `max_features='sqrt'` → número de variáveis consideradas em cada divisão  
-- `oob_score=True` → uso de validação *out-of-bag*  
-- `random_state=42` → reprodutibilidade
-
-O modelo foi treinado com o conjunto de dados de treino (`X_train`, `y_train`).
+- **80% treino**
+- **20% teste**
 
 ---
 
-## 5. Avaliação do Modelo
+# Treinamento do Modelo (Prática + Explicação Teórica)
 
-Após o treinamento, o modelo foi testado com o conjunto de teste (`X_test`).
+Foi utilizado o **RandomForestClassifier**, com os seguintes hiperparâmetros:
 
-**Métricas de desempenho obtidas:**
-```python
+### Parâmetros utilizados
+- `n_estimators=100` → 100 árvores
+- `max_depth=None` → árvores podem crescer livremente
+- `max_features='sqrt'` → raiz quadrada do número de variáveis
+- `oob_score=True` → ativação da validação Out-of-Bag
+- `random_state=42` → garante reprodutibilidade
+
+### Por que `max_features='sqrt'`?
+Essa é uma estratégia padrão para:
+- aumentar a diversidade entre as árvores
+- reduzir correlação entre elas
+- melhorar a generalização
+
+---
+
+# Avaliação do Modelo
+
+### Métricas obtidas
+```
 Acurácia: 0.804
 OOB Score: 0.794
 ```
 
-**Relatório de classificação:**
+O OOB Score próximo da acurácia indica que:
+- o modelo não está sofrendo overfitting
+- a validade interna é consistente
+
+### Relatório de classificação
 ```
               precision    recall  f1-score   support
            0       0.82      0.86      0.84       105
@@ -230,14 +255,17 @@ OOB Score: 0.794
 weighted avg       0.80      0.80      0.80       179
 ```
 
-O modelo apresentou desempenho **sólido e equilibrado**, com boa generalização entre as classes.
+As classes estão relativamente equilibradas nos resultados.
 
 ---
 
-## 6. Importância das Variáveis
+# Importância das Variáveis (Teoria + Prática)
 
-O modelo fornece uma medida de **importância de cada variável** para as decisões da floresta:
+O Random Forest mede importância das variáveis com base em:
+- redução média da impureza (Gini ou Entropia)
+- ou permutação de variáveis (quando configurado)
 
+### Importâncias obtidas
 | Variável     | Importância |
 |---------------|-------------:|
 | Fare          | 0.274 |
@@ -249,27 +277,26 @@ O modelo fornece uma medida de **importância de cada variável** para as decis�
 | Embarked_S    | 0.023 |
 | Embarked_Q    | 0.011 |
 
-> As variáveis **Fare**, **Sex_male** e **Age** são as mais relevantes para prever a sobrevivência.  
-> Isso indica que o custo do bilhete (e, indiretamente, a classe social), o sexo e a idade foram fatores determinantes.
+### Interpretação
+- **Fare** (valor da passagem) → principal indicador  
+  Passageiros de classes mais altas sobreviveram mais.
+- **Sex_male** → homens tiveram menor chance de sobreviver.
+- **Age** → crianças tiveram prioridade em barcos.
+- Outros atributos tiveram menor influência.
 
 ---
 
-## 7. Conclusão e Possíveis Melhorias
+# Conclusão
 
-O modelo **Random Forest** apresentou **acurácia de aproximadamente 80%**, demonstrando boa capacidade de previsão.  
+O modelo apresentou:
+- **Acurácia ≈ 80%**
+- Excelente estabilidade (OOB Score similar)
+- Boa capacidade de generalização
 
-**Principais conclusões:**
-- Passageiros com tarifas mais altas e do sexo feminino tiveram maior chance de sobreviver.
-- A idade também é um fator relevante: crianças e jovens apresentaram taxas de sobrevivência superiores.
-
-**Possíveis melhorias futuras:**
-- Aplicar **tuning de hiperparâmetros** com `GridSearchCV` ou `RandomizedSearchCV`.  
-- Balancear as classes com `class_weight='balanced'` ou técnicas de oversampling (ex: SMOTE).  
-- Criar variáveis derivadas (ex: `FamilySize = SibSp + Parch + 1`).  
-- Avaliar outros algoritmos (XGBoost, Gradient Boosting, etc.).
+### Conclusões importantes sobre o Titanic
+- Mulheres e crianças tiveram maior probabilidade de sobreviver.
+- Passagens mais caras → maior taxa de sobrevivência.
+- Variáveis como `SibSp`, `Embarked` e `Parch` tiveram menor influência no modelo.
 
 ---
 
-**Autor:** Rafael Arkchimor Lucena    
-**Ferramentas:** Python, Scikit-Learn, Pandas, MkDocs  
-**Base de dados:** [Titanic Dataset - Kaggle](https://www.kaggle.com/datasets/yasserh/titanic-dataset)

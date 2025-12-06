@@ -125,8 +125,61 @@ O objetivo é agrupar os passageiros com base em características selecionadas e
 
 
 
-# Gráfico
-    
+# Introdução ao K-Means
+
+O **K-Means** é um algoritmo de **agrupamento não supervisionado**, cujo objetivo é dividir os dados em *k* grupos (clusters) de forma que os elementos dentro de um mesmo cluster sejam semelhantes entre si e diferentes dos clusters vizinhos.
+
+A ideia central é:
+
+> Encontrar centros (chamados de **centroides**) que representem cada grupo, e atribuir cada ponto ao centro mais próximo.
+
+O K-Means é amplamente utilizado em:
+- segmentação de clientes  
+- compressão de imagens  
+- agrupamento de usuários  
+- descoberta de padrões ocultos em datasets não rotulados  
+
+Como o dataset Titanic não possui um rótulo de cluster verdadeiro, o objetivo aqui é **descobrir segmentos naturais entre os passageiros**.
+
+---
+
+# Como o K-Means funciona (Intuição + Matemática mínima)
+
+## Intuição do algoritmo
+
+O algoritmo segue duas etapas repetidas:
+
+1. **Atribuição**: cada ponto é colocado no cluster cujo centróide é o mais próximo.  
+2. **Atualização**: recalculam-se os centróides como a média dos pontos atribuídos ao cluster.
+
+Isso é repetido até que os centróides não mudem mais ou o número máximo de iterações seja alcançado.
+
+---
+##  Limitações teóricas do K-Means
+
+- Assume clusters **esféricos e de tamanhos semelhantes**  
+- Sensível a **outliers**  
+- Sensível à inicialização → por isso existe o **k-means++**  
+- Requer definição prévia de **k**  
+- Funciona melhor com variáveis **numéricas e escaladas**
+
+---
+
+# Bibliotecas utilizadas (com justificativa teórica)
+
+- **pandas** → manipulação dos dados brutos  
+- **matplotlib** → visualização e inspeção dos clusters  
+- **KMeans (scikit-learn)** → implementação do algoritmo  
+- **StandardScaler** → K-Means exige padronização (distâncias euclidianas)  
+- **LabelEncoder** → transformação de variáveis categóricas  
+- **kagglehub** → download programático do dataset  
+- **StringIO** → suporte à exportação do gráfico no formato SVG  
+
+---
+
+# Código Exemplo e execução
+
+
 === "output"
 
     ``` python exec="on" html="1"
@@ -139,67 +192,61 @@ O objetivo é agrupar os passageiros com base em características selecionadas e
     --8<-- "./docs/k-means/kmeans_script.py"
     ```
 
----
+# Download e carregamento do dataset
 
-## 1. Importação das bibliotecas
-
--   **pandas**: manipulação e leitura dos dados.\
--   **matplotlib**: criação de gráficos.\
--   **sklearn.cluster.KMeans**: implementação do algoritmo de
-    agrupamento K-Means.\
--   **sklearn.preprocessing.StandardScaler, LabelEncoder**: padronização
-    e codificação de variáveis.\
--   **kagglehub**: download automático do dataset a partir do Kaggle.\
--   **os**: manipulação de caminhos de diretórios.\
--   **StringIO**: permite exportar gráficos em SVG para uso no MkDocs.\
--   **numpy**: operações matemáticas.\
--   **sklearn.metrics**: cálculo de acurácia e matriz de confusão para
-    avaliar o agrupamento.
-
-------------------------------------------------------------------------
-
-## 2. Download e carregamento do dataset
-
-1.  O dataset **Titanic-Dataset.csv** é baixado automaticamente a partir
-    do Kaggle utilizando `kagglehub`.\
-2.  Em seguida, o arquivo é carregado em um DataFrame Pandas.
-
-``` python
+```python
 path = kagglehub.dataset_download("yasserh/titanic-dataset")
 file_path = os.path.join(path, "Titanic-Dataset.csv")
 df = pd.read_csv(file_path)
 ```
 
-------------------------------------------------------------------------
+---
 
-## 3. Preparação dos dados
+# Preparação dos dados (com explicações teóricas)
 
-### Variáveis selecionadas
+## ✔ Por que preparar os dados?
 
-As seguintes variáveis são utilizadas como entrada do K-Means:
+O K-Means **não trabalha com dados ausentes, nem com variáveis categóricas**, e é sensível às escalas.  
+Por isso seguimos estes passos:
 
--   Pclass\
--   Sex\
--   Age\
--   SibSp\
--   Parch\
--   Fare
+---
 
-### Pré-processamento aplicado
+## ✔ Seleção das variáveis
 
--   **Codificação**: a variável `Sex` é convertida para valores
-    numéricos (0/1).\
--   **Tratamento de nulos**: valores ausentes na idade (`Age`) são
-    substituídos pela mediana.\
--   **Padronização (normalização)**: todas as variáveis são escalonadas
-    com `StandardScaler`.\
--   **Label verdadeiro**: a variável `Survived` é guardada para comparar
-    depois.
+Foram escolhidas:
 
-``` python
+- Pclass  
+- Sex  
+- Age  
+- SibSp  
+- Parch  
+- Fare  
+
+Essas variáveis representam bem o perfil dos passageiros.
+
+---
+
+## ✔ Conversão de variável categórica
+
+`Sex` → 0 ou 1.
+
+---
+
+## ✔ Tratamento de valores ausentes
+
+`Age` → preenchimento com a **mediana**.
+
+---
+
+## ✔ Normalização (item crítico!)
+
+O K-Means usa **distância euclidiana**, então variáveis com magnitudes maiores dominam o clustering.  
+Por isso aplicamos `StandardScaler()`:
+
+---
+
+```python
 features = df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare']].copy()
-labels_true = df['Survived'].copy()
-
 features['Sex'] = LabelEncoder().fit_transform(features['Sex'])
 features['Age'].fillna(features['Age'].median(), inplace=True)
 
@@ -207,31 +254,65 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(features)
 ```
 
-------------------------------------------------------------------------
+---
 
-## 4. Aplicação do K-Means
+# Aplicação do algoritmo K-Means (com teoria dos parâmetros)
 
--   **Clusters**: 2\
--   **Inicialização**: k-means++\
--   **Iterações máximas**: 100\
--   **n_init**: 10\
--   **Seed**: 42
+## Parâmetros utilizados:
 
-``` python
-kmeans = KMeans(n_clusters=2, init='k-means++', max_iter=100,
-                random_state=42, n_init=10)
-labels_pred = kmeans.fit_predict(X_scaled)
+- **n_clusters=2**  
+- **init='k-means++'**  
+- **max_iter=100**  
+- **random_state=42**  
+- **n_init=10**  
+
+---
+
+```python
+kmeans = KMeans(n_clusters=2, init='k-means++', max_iter=100, random_state=42, n_init=10)
+labels = kmeans.fit_predict(X_scaled)
 ```
 
-------------------------------------------------------------------------
+---
 
-## 5. Ajuste dos rótulos
+# Visualização dos clusters
 
-O K-Means não sabe o que representa "0" ou "1".\
-Por isso, verifica-se se os rótulos precisam ser invertidos:
+```python
+plt.figure(figsize=(10, 8))
+plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=labels, cmap='viridis', s=50)
 
-``` python
-if accuracy_score(labels_true, labels_pred) < accuracy_score(labels_true, 1-labels_pred):
-    labels_pred = 1-labels_pred
+plt.scatter(kmeans.cluster_centers_[:, 0], 
+            kmeans.cluster_centers_[:, 1],
+            c='red', marker='*', s=200, label='Centroids')
+
+plt.title("K-Means Clustering - Titanic Dataset")
+plt.xlabel("Feature 1 (scaled)")
+plt.ylabel("Feature 2 (scaled)")
+plt.legend()
 ```
+
+---
+
+# Exportação do gráfico para MkDocs
+
+```python
+from io import StringIO
+buffer = StringIO()
+plt.savefig(buffer, format="svg", transparent=True)
+print(buffer.getvalue())
+```
+
+---
+
+# Interpretação dos clusters
+
+Os clusters não representam classes "verdadeiras", mas padrões naturais dos dados.  
+Com frequência, no Titanic, os agrupamentos tendem a separar:
+
+- passageiros de classes mais altas  
+- tarifas maiores  
+- famílias menores  
+- perfis de idade distintos  
+
+---
 

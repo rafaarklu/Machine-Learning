@@ -122,29 +122,67 @@ Utilizaremos a base de dados de **carros usados da BMW** para prever a **categor
 
 
 
+# Modelo de Árvore de Decisão (Decision Tree)
+
+Este documento apresenta a implementação, explicação teórica e análise do modelo **Decision Tree Classifier**, aplicado ao dataset *BMW Used Cars* do Kaggle.  
+
 ---
 
-## Modelo Árvore de Decisão (Decision Tree)
+# O que é uma Árvore de Decisão?
 
+Uma **Árvore de Decisão** (Decision Tree) é um algoritmo de Machine Learning supervisionado que pode ser usado para:
+
+- **Classificação** (prever categorias)
+- **Regressão** (prever valores contínuos)
+
+Ela se comporta como uma sequência de perguntas do tipo *"se... então..."*.  
+Cada pergunta divide os dados em grupos mais homogêneos.  
+Uma árvore é composta por:
+
+- **Raiz (root)** → primeira divisão  
+- **Nós internos** → perguntas  
+- **Folhas (leaves)** → resultado final (classe prevista)
+
+### Objetivo do algoritmo
+Criar divisões que deixem os grupos **o mais puros possível**, isto é, com elementos de uma única classe.
+
+### Métricas usadas para decidir as divisões
+
+- **Gini Impurity**  
+- **Entropia**  
+Ambas medem o quanto um conjunto é "misturado" entre classes.  
+Quanto **menor** esse valor, mais pura é a divisão.
+
+Árvores têm benefícios importantes:
+
+- Interpretabilidade (gráfico fácil de entender)
+- Não exigem normalização dos dados
+- Aceitam dados numéricos e categóricos (com encoding)
+- Capturam relações não-lineares
+
+---
+
+# Execução do Script
+
+A seguir está o código executado:
 
 === "output"
 
-    ``` python exec="on" html="1"
-    --8<-- "./docs/Machine-Learning/decision-script.py"
-    ```
+```python exec="on" html="1"
+--8<-- "./docs/Machine-Learning/decision-script.py"
+```
 
 === "code"
 
-    ``` python exec="off" 
-    --8<-- "./docs/Machine-Learning/decision-script.py"
-    ```
+```python exec="off"
+--8<-- "./docs/Machine-Learning/decision-script.py"
+```
 
 ---
 
+# Passo a Passo da Implementação
 
-## Passo a Passo
-
-### 1. Baixar e importar bibliotecas
+## Importar bibliotecas
 
 ```python
 import matplotlib.pyplot as plt
@@ -159,17 +197,15 @@ import kagglehub
 plt.figure(figsize=(12, 10))
 ```
 
-**Explicação:**  
-Aqui importamos as bibliotecas necessárias:
-- `pandas` para manipulação de dados,  
-- `matplotlib` para visualização,  
-- `scikit-learn` (`tree`, `train_test_split`, `LabelEncoder`, `accuracy_score`) para o modelo de árvore e métricas,  
-- `kagglehub` para baixar o dataset,  
-- `StringIO` para salvar e exibir gráficos.  
+**Explicação Teórica:**  
+- `DecisionTreeClassifier` cria o modelo.  
+- Árvores não exigem normalização, pois dividem os dados com base em **pontos de corte**.
+- `LabelEncoder` transforma textos em números (necessário porque árvores não trabalham com strings).  
+- `train_test_split` separa os dados de forma aleatória.  
 
 ---
 
-### 2. Carregar a base de dados
+## Carregar a base
 
 ```python
 path = kagglehub.dataset_download("adityadesai13/used-car-dataset-ford-and-mercedes")
@@ -179,12 +215,12 @@ x = df[['model', 'year', 'price', 'transmission', 'mileage', 'fuelType', 'tax', 
 ```
 
 **Explicação:**  
-O dataset da BMW é baixado diretamente do Kaggle e carregado em um DataFrame `df`.  
-Selecionamos apenas as colunas relevantes que serão usadas como variáveis explicativas (features).
+Carregamos o dataset BMW.  
+Selecionamos atributos que influenciam o consumo do veículo.
 
 ---
 
-### 3. Transformar variáveis e criar a variável alvo
+## Transformar variáveis e definir o alvo
 
 ```python
 label_encoder = LabelEncoder()
@@ -192,7 +228,6 @@ x['model'] = label_encoder.fit_transform(x['model'])
 x['transmission'] = label_encoder.fit_transform(x['transmission'])
 x['fuelType'] = label_encoder.fit_transform(x['fuelType'])  
 
-# Definir saída (Alvo de Classificação: Categoria de Consumo)
 y = df['consumo_cat'] = pd.cut(
         df['mpg'],
         bins=[0, 25, 40, 100],  
@@ -203,14 +238,19 @@ data = x.copy()
 data['target'] = y
 ```
 
-**Explicação:**  
-As variáveis **categóricas** (`model`, `transmission`, `fuelType`) são convertidas para valores **numéricos** usando `LabelEncoder`.  
-A variável alvo (`consumo_cat`) é criada a partir da coluna `mpg`, categorizando o consumo em **baixo, médio e alto**.  
-O DataFrame final (`data`) contém tanto os atributos quanto o target.
+### Teoria aplicada
+Árvores:
+
+- lidam bem com variáveis categóricas **desde que convertidas para números**
+- não precisam que os dados sejam escalonados
+- conseguem encontrar interações automaticamente, como:
+  > *alta cilindrada + câmbio automático → consumo baixo*
+
+A variável alvo é categorizada a partir da economia de combustível (`mpg`).
 
 ---
 
-### 4. Limpar valores ausentes
+## Remover valores ausentes
 
 ```python
 data = data.dropna()
@@ -219,13 +259,13 @@ x_clean = data.drop('target', axis=1)
 y_clean = data['target']
 ```
 
-**Explicação:**  
-Aqui removemos valores ausentes (`NaN`) para garantir a qualidade dos dados.  
-`x_clean` contém apenas as features e `y_clean` a variável alvo (`consumo_cat`).
+**Por quê?**  
+Árvores não lidam com valores faltantes nativamente.  
+Removemos entradas com `NaN`.
 
 ---
 
-### 5. Treinar e Avaliar o Modelo
+## Treinar e avaliar o modelo
 
 ```python
 x_train, x_test, y_train, y_test = train_test_split(
@@ -234,125 +274,68 @@ x_train, x_test, y_train, y_test = train_test_split(
     random_state=42
 )
 
-# Criar e treinar o modelo
 classifier = tree.DecisionTreeClassifier()
 classifier.fit(x_train, y_train)
 
-# Avaliar o modelo
 accuracy = classifier.score(x_test, y_test)
 print(f"Accuracy: {accuracy:.2f}")
 
-# Plotar a árvore
 tree.plot_tree(classifier)
 
-# Salvar e imprimir para exibição (útil para documentação)
 buffer = StringIO()
 plt.savefig(buffer, format="svg")
 print(buffer.getvalue())
 ```
 
-**Explicação:**  
-1. **Divisão da base**: `train_test_split` divide os dados em treino (30%) e teste (70%).  
-2. **Criação do modelo**: `DecisionTreeClassifier` é instanciado.  
-3. **Treinamento**: `fit(x_train, y_train)` ajusta o modelo aos dados de treino.  
-4. **Avaliação**: `score(x_test, y_test)` retorna a **acurácia** do modelo.  
-5. **Visualização**: `tree.plot_tree` gera o gráfico da árvore de decisão.  
-6. **Exportação**: o gráfico é salvo em formato SVG para uso em documentação.
+### Teoria da Árvore aplicada ao treino
+
+Árvore de decisão:
+
+1. **Seleciona uma variável**
+2. **Testa possíveis cortes**
+3. **Calcula o ganho de impureza**
+4. **Escolhe o melhor ponto**
+5. Repete o processo até:
+   - atingir profundidade máxima
+   - ou não haver melhora
+
+Como não definimos parâmetros, o modelo:
+
+- cresce até o limite (tendência a overfitting)
+- usa Gini Impurity por padrão
 
 ---
 
-# Resumo
-O projeto segue as seguintes etapas:  
-1. Importação de bibliotecas,  
-2. Carregamento da base de dados,  
-3. Transformação e criação da variável alvo,  
-4. Limpeza de valores ausentes,  
-5. Treinamento, avaliação e visualização da árvore de decisão.  
+# Interpretação dos Resultados
 
-Esse fluxo permite **analisar o desempenho do modelo** e entender como as variáveis influenciam a categoria de consumo de combustível.
+A acurácia indica o quão bem o modelo classificou as categorias de consumo (`baixo`, `médio`, `alto`).
 
-    ``` python exec="off" 
-    --8<-- "./docs/Machine-Learning/decision-script.py"
-    ```
+### Ponto forte das árvores
+Elas conseguem aprender regras como:
+
+- **Preço alto + motor grande → consumo baixo**
+- **Carro novo + motor pequeno → consumo alto**
+- **Alta quilometragem → pior consumo**  
+
+Essas regras são automaticamente encontradas pelo algoritmo.
+
+### Fragilidade
+Sem limitar:
+- profundidade  
+- número mínimo de amostras por nó  
+a árvore pode decorar o treino → **overfitting**.
 
 ---
 
-## Passo a Passo
+# Conclusão
 
-### 1. Baixar e importar bibliotecas
+Este projeto mostra:
 
-```python
-import matplotlib.pyplot as plt
-import pandas as pd
-from io import StringIO
-from sklearn import tree
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score
-import kagglehub
+- Como aplicar uma **Árvore de Decisão** na prática  
+- Como transformar variáveis categóricas  
+- Como criar uma variável alvo categorizada  
+- Como visualizar e interpretar o modelo  
+- Como avaliar desempenho  
 
-plt.figure(figsize=(12, 10))
-```
+Árvores são um dos algoritmos mais intuitivos e importantes do Machine Learning moderno, base de modelos mais poderosos como Random Forest e Gradient Boosting.
 
-### 2. Carregar a base de dados
-
-```python
-path = kagglehub.dataset_download("adityadesai13/used-car-dataset-ford-and-mercedes")
-
-df = pd.read_csv(path + "/bmw.csv")  
-x = df[['model', 'year', 'price', 'transmission', 'mileage', 'fuelType', 'tax', 'engineSize']]
-```
-
-### 3. Transformar variáveis e criar a variável alvo
-
-```python
-label_encoder = LabelEncoder()
-x['model'] = label_encoder.fit_transform(x['model'])
-x['transmission'] = label_encoder.fit_transform(x['transmission'])
-x['fuelType'] = label_encoder.fit_transform(x['fuelType'])  
-
-# Definir saída (Alvo de Classificação: Categoria de Consumo)
-y = df['consumo_cat'] = pd.cut(
-        df['mpg'],
-        bins=[0, 25, 40, 100],  
-        labels=['baixo', 'medio', 'alto']
-)
-
-data = x.copy()
-data['target'] = y
-```
-
-### 4. Limpar valores ausentes
-
-```python
-data = data.dropna()
-
-x_clean = data.drop('target', axis=1)
-y_clean = data['target']
-```
-
-### 5. Treinar e Avaliar o Modelo
-
-```python
-x_train, x_test, y_train, y_test = train_test_split(
-    x_clean, y_clean, 
-    test_size=0.7, 
-    random_state=42
-)
-
-# Criar e treinar o modelo
-classifier = tree.DecisionTreeClassifier()
-classifier.fit(x_train, y_train)
-
-# Avaliar o modelo
-accuracy = classifier.score(x_test, y_test)
-print(f"Accuracy: {accuracy:.2f}")
-
-# Plotar a árvore
-tree.plot_tree(classifier)
-
-# Salvar e imprimir para exibição (útil para documentação)
-buffer = StringIO()
-plt.savefig(buffer, format="svg")
-print(buffer.getvalue())
-```
